@@ -568,13 +568,14 @@ class AttPayRoll(models.Model):
       def mcgi2(self,rec,cod_holiday,diff_hour,cod_holiday2):
                new_exit=datetime.combine(rec.att_date+timedelta(days=1), datetime.min.time())+timedelta(hours=diff_hour)
                qry = f"""
-                     select * from  hr_work_entry 
+                     select distinct hr_work_entry.date_start,hr_work_entry.date_stop from  hr_work_entry 
                      inner join hr_employee on hr_work_entry.employee_id=hr_employee.id
                      inner join od_attpayroll on 
                      hr_employee.id=od_attpayroll.employee_id
                      where work_entry_type_id={cod_holiday} and hr_work_entry.name='holiday attendance {rec.id}'
                      and hr_employee.is_worker =TRUE
                      """
+               print(qry)
                self._cr.execute(qry)
                values = self._cr.dictfetchall()
                if values:
@@ -590,6 +591,8 @@ class AttPayRoll(models.Model):
                               hr_employee.id=od_attpayroll.employee_id
                               where od_attpayroll.id={rec.id}
                               """
+                          # print('====== >')
+                          # print(qry)
                           self._cr.execute(qry)
 
                           qry =f"""
@@ -609,6 +612,8 @@ class AttPayRoll(models.Model):
                                hr_employee.id=od_attpayroll.employee_id
                                where od_attpayroll.id={rec.id}
                                """
+                           # print('------------ <')
+                           # print(qry)
                            self._cr.execute(qry)
                            qry = f"""
                                      update hr_work_entry set date_stop='{rec.os_out}',
